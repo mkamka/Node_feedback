@@ -1,0 +1,23 @@
+{
+  "name": "node_feedback",
+  "version": "0.0.1",
+  "description": "Node feedback form app using Express, NeDB and front end showcase done with Angularjs and React",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mkamka/Node_feedback.git"
+  },
+  "author": "npm mkamka",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mkamka/Node_feedback/issues"
+  },
+  "homepage": "https://github.com/mkamka/Node_feedback#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "nedb": "^1.8.0"
+  }
+}
