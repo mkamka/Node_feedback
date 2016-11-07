@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<style> .ng-cloak { display: none !important; } </style>
+<script>
+/*$(document).ready(function(){
+        $.getJSON("kysymykset.JSON", function(result){
+            $.each(result, function(i, field){
+                $("form").append(field.id + ".  " +field.kysymys + "<br/>").append("<input name="+field.id+"/><br/>");
+            });
+        });
+        $('#vastauslomake').on('submit', function(e) { 
+            var inputs = $("#vastauslomake :input:not(:submit)");
+            e.preventDefault();
+            var vastaukset = $.map(inputs, function(x, y) {
+                		return {
+                        	id: x.name,
+                        	vastaus: $(x).val()
+                    };
+                });
+            console.log(vastaukset);
+            $.ajax({
+                url: 'talletavastaus', // php script to retern json encoded string
+                data:JSON.stringify(vastaukset),  // serialized data to send on server
+                contentType: "application/json; charset=utf-8",
+                dataType:'json', // set recieving type - JSON in case of a question
+                type:'POST', // set sending HTTP Request type
+                success: function (data) {
+                	console.log(data)
+                	$("#response pre").html("Vastaukset tallennetu! Kiitos!")
+                	$('#vastauslomake')[0].reset();
+                	
+                },
+                error: function (err) {
+                	console.log("jotain meni pieleen: katso virhe alta:")
+                	$("#response pre").html("jotain meni pieleen!")
+                	console.log(err)	
+                }
+            });
+            
+            });
+ 
+       
+});*/
+</script>
+</head>
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl">
+
+<form  name="lomake"  ng-submit="submitForm()" >
+
+  <div  class="form-group " ng-repeat="(index, kysymys) in myWelcome" >
+  
+    <label ng-cloak>{{ (index+1) }}. {{ kysymys.kysymys }}</label>
+    <br/>
+    <input type="text" class="form-control" name="person_{{$index}}" ng-model="vastaukset[kysymys._id]" required/>
+    <button ng-click="removeQuestion(kysymys._id)">-</button>
+    <br/>
+    <p class="help-block" ng-show="lomake['person_' + $index].$touched && lomake['person_' + $index].$invalid" >Kenttä ei saa olla tyhjä</p>
+  </div>
+	<button type="submit" class="btn btn-primary" ng-disabled="lomake.$invalid">Submit</button>
+</form>
+
+<form  name="lisaakysymys"  ng-submit="addQuestion()" >
+
+  <div  class="form-group ">
+  
+    <label >Lisää uusi kysymys</label>
+    <br/>
+    <input type="text" class="form-control" name="uusikysymys" ng-model="kysymys" required/>
+    <br/>
+    <p class="help-block" ng-show="lisaakysymys.uusikysymys.$touched && lisaakysymys.uusikysymys.$invalid">Kysymys ei saa olla tyhjä</p>
+  </div>
+	<button type="submit" class="btn btn-primary" ng-disabled="lisaakysymys.$invalid">Submit</button>
+</form>
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http,$window) {
+
+  $http.get("get.json")
+  .then(function(response) {
+      $scope.myWelcome = response.data;
+      console.log(response.data);
+      
+  });
+
+  $scope.vastaukset = {};
+
+  $scope.submitForm=function(){
+
+      var data=$scope.vastaukset;  
+      console.log(JSON.stringify(data));
+      /* post to server*/
+      $http.post('tallenna', JSON.stringify(data),{
+                headers : {
+                    'Content-Type': 'application/json'
+                }}).success(function(response) {
+      				 	$window.location.reload();
+      
+  						});
+  				       
+  	};
+  $scope.addQuestion = function(){
+  	console.log($scope.kysymys);
+  	$http.post('tallennakysymys', JSON.stringify({kysymys: $scope.kysymys}),{
+         headers : {
+                    'Content-Type': 'application/json'
+                }}).success(function(response) {
+      						$window.location.reload();
+      						//alert('Thank you…!');
+  						});
+  			
+  
+
+  };
+  $scope.removeQuestion=function(questionID){
+  
+  	$http.post('poistakysymys', JSON.stringify({kysymys_id: questionID }),{
+         headers : {
+                    'Content-Type': 'application/json'
+                }}).success(function(response) {
+      						$window.location.reload();
+      						//alert('Thank you…!');
+  						});
+  };
+});
+
+</script>
+</body>
+</html>
